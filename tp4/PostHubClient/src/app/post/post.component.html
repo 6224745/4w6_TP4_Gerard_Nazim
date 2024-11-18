@@ -45,7 +45,7 @@
         <button><fa-icon [icon]="faMessage"></fa-icon> {{post.mainComment!.subCommentTotal}}</button>
       </div>
       <div>
-        <input *ngIf="toggleMainCommentEdit" type="file" accept="images/*" name="mainCommentPictures">
+        <input #myPictureViewChild *ngIf="toggleMainCommentEdit" type="file" accept="images/*" name="mainCommentPictures">
       </div>
       <div>
         <button *ngIf="toggleMainCommentEdit" (click)="toggleMainCommentEdit = false">Annuler</button>
