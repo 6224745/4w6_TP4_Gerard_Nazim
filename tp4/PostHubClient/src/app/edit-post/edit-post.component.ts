@@ -18,7 +18,7 @@ export class EditPostComponent {
   hub : Hub | null = null;
   postTitle : string = "";
   postText : string = "";
-  displayInputFile : boolean = false;
+  listeimage :File[] = []
 
   constructor(public hubService : HubService, public route : ActivatedRoute, public postService : PostService, public router : Router) { }
 
@@ -27,6 +27,14 @@ export class EditPostComponent {
 
     if(hubId != null){
       this.hub = await this.hubService.getHub(+hubId);
+    }
+  }
+  async Ajoutimage(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      for(let i = 0; i < input.files.length; i++){
+        this.listeimage.push(input.files[i]);
+      }
     }
   }
 
@@ -40,7 +48,8 @@ export class EditPostComponent {
 
     let postDTO = {
       title : this.postTitle,
-      text : this.postText
+      text : this.postText,
+      imageurl: this.listeimage
     };
 
     let newPost : Post = await this.postService.postPost(this.hub.id, postDTO);

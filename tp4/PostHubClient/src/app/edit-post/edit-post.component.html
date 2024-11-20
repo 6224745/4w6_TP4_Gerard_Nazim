@@ -14,11 +14,16 @@
             <div>
                 Texte
             </div>
-            <textarea rows="6" id="postContent" name="postContent" placeholder="Texte du post ..." [(ngModel)]="postText"></textarea>
+            <textarea rows="6" id="postContent" name="postContent" placeholder="Texte du post ..." [(ngModel)]="postText">
+            <div>
+                <img *ngFor="let image of  listeimage" [src]="image" class="postImage" />
+            </div>
+            </textarea>
         </div>
-        <div *ngIf="displayInputFile" class="commentPictureAdd">
-            <input type="file" accept="images/*" name="commentPictures">
-        </div>
+        <div id="fileUploadBox">
+            <div>Ajouter des images</div>
+            <input type="file" accept="images/*" (change)="Ajoutimage($event)" />
+          </div>
         <div class="postFooter">
             <!-- Ajouter un input de type file ici ne serait pas bête du tout -->
             <button (click)="createPost()">Envoyer</button>
