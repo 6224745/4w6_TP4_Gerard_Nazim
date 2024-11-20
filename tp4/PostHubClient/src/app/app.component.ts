@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, viewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { HubService } from './services/hub.service';
 import { Hub } from './models/hub';
@@ -22,7 +22,7 @@ export class AppComponent {
   faRightToBracket = faRightToBracket;
   faRightFromBracket = faRightFromBracket;
   faChevronDown = faChevronDown;
- 
+
   searchText : string = "";
 
   hubsToggled : boolean = false;
