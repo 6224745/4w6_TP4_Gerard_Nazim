@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { faDownLong, faEllipsis, faImage, faMessage, faUpLong, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Post } from '../models/post';
 import { PostService } from '../services/post.service';
@@ -8,8 +8,6 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommentComponent } from '../comment/comment.component';
-import { lastValueFrom } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-post',
@@ -24,8 +22,6 @@ export class PostComponent {
   sorting : string = "popular";
   newComment : string = "";
   newMainCommentText : string = "";
-  @ViewChild('myPictureViewChild', { static: false }) pictureInput?: ElementRef;
-
 
   // Booléens sus pour cacher / afficher des boutons
   isAuthor : boolean = false;
@@ -41,7 +37,7 @@ export class PostComponent {
   faImage = faImage;
   faXmark = faXmark;
 
-  constructor(public postService : PostService, public route : ActivatedRoute, public router : Router, public commentService : CommentService,public http :HttpClient) { }
+  constructor(public postService : PostService, public route : ActivatedRoute, public router : Router, public commentService : CommentService) { }
 
   async ngOnInit() {
     let postId : string | null = this.route.snapshot.paramMap.get("postId");
@@ -49,7 +45,6 @@ export class PostComponent {
     if(postId != null){
       this.post = await this.postService.getPost(+postId, this.sorting);
       this.newMainCommentText = this.post.mainComment == null ? "" : this.post.mainComment.text;
-    
     }
 
     
@@ -67,19 +62,6 @@ export class PostComponent {
       alert("Écris un commentaire niochon");
       return;
     }
-    if (this.pictureInput == undefined) {
-      console.log("No picture input");
-      return;
-  }
-
-  let files = this.pictureInput.nativeElement.files[0];
-  if (files == null) {
-      console.log("input html ne contient pas d'image");
-      return;
-  }
-
-  let formData = new FormData();
-  formData.append("picture", files, files.name);
 
     let commentDTO = {
       text : this.newComment
@@ -143,5 +125,4 @@ export class PostComponent {
     await this.commentService.deleteComment(this.post.mainComment.id);
     this.router.navigate(["/"]);
   }
- 
 }
