@@ -31,6 +31,7 @@ export class PostComponent {
   editMenu : boolean = false;
   displayInputFile : boolean = false;
   toggleMainCommentEdit : boolean = false;
+  pictureIds : number[] = [];
 
   // Icônes Font Awesome
   faEllipsis = faEllipsis;
@@ -52,6 +53,7 @@ export class PostComponent {
 
     
     this.isAuthor = localStorage.getItem("username") == this.post?.mainComment?.username;
+   
   }
 
   async toggleSorting(){
@@ -87,6 +89,8 @@ export class PostComponent {
       }
          
       fromData.append("image"+i, file,file.name);
+      i++;
+      console.log("image"+i)    
     }
 
 

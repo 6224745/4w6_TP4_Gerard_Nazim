@@ -49,5 +49,17 @@ export class CommentService {
     let x = await lastValueFrom(this.http.put<any>(domain + "api/Comments/DownvoteComment/" + commentId, null));
     console.log(x);
   }
+  async postCommentWithImages(commentText: string, images: File[]): Promise<any> {
+    let formData = new FormData();
+    formData.append("commentText", commentText);
 
+    for (let i = 0; i < images.length; i++) {
+      formData.append(`image${i}`, images[i]);
+    }
+
+    return await lastValueFrom(this.http.post<any>(domain + "api/Comments/PostComment", formData));
+  }
 }
+
+
+
