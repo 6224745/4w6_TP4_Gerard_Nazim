@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Post } from '../models/post';
 import { HubService } from '../services/hub.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -29,30 +29,22 @@ export class EditPostComponent {
       this.hub = await this.hubService.getHub(+hubId);
     }
   }
-  async Ajoutimage(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      for(let i = 0; i < input.files.length; i++){
-        this.listeimage.push(input.files[i]);
-      }
-    }
-  }
+  @ViewChild("UneImage", {static:false}) pictureInput ?: ElementRef;
 
   // Créer un nouveau post (et son commentaire principal)
   async createPost(){
+    let file = this.pictureInput?.nativeElement.files[0];
     if(this.postTitle == "" || this.postText == ""){
       alert("Remplis mieux le titre et le texte niochon");
       return;
     }
     if(this.hub == null) return;
+    const formData = new FormData()
+    formData.append("title", this.postTitle)
+    formData.append("text", this.postText)
+    formData.append("monImage", file, file.name);
 
-    let postDTO = {
-      title : this.postTitle,
-      text : this.postText,
-      imageurl: this.listeimage
-    };
-
-    let newPost : Post = await this.postService.postPost(this.hub.id, postDTO);
+    const newPost : Post = await this.postService.postPost(this.hub.id, formData);
 
     // On se déplace vers le nouveau post une fois qu'il est créé
     this.router.navigate(["/post", newPost.id]);

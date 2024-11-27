@@ -20,12 +20,10 @@
             </div>
             </textarea>
         </div>
-        <div id="fileUploadBox">
-            <div>Ajouter des images</div>
-            <input type="file" accept="images/*" (change)="Ajoutimage($event)" />
-          </div>
         <div class="postFooter">
+            <div>Ajouter des images</div>
             <!-- Ajouter un input de type file ici ne serait pas bête du tout -->
+            <input #UneImage type="file" accept="images/*"/>
             <button (click)="createPost()">Envoyer</button>
         </div>
         
