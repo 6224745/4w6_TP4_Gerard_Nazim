@@ -68,9 +68,7 @@ export class PostComponent {
       return;
     }
 
-    let commentDTO = {
-      text : this.newComment
-    }
+    
     if(this.pictureInput == undefined) {
 
       console.log("html pas charger")
@@ -79,7 +77,7 @@ export class PostComponent {
 
     }
     let i = 0;
-    let fromData = new FormData();
+    let formData = new FormData();
     while(this.pictureInput.nativeElement.files[i] != null){
     
       let file = this.pictureInput.nativeElement.files[i];  
@@ -88,7 +86,8 @@ export class PostComponent {
       return;
       }
          
-      fromData.append("image"+i, file,file.name);
+      formData.append("image"+i, file,file.name);
+      formData.append("text", this.newComment);
       i++;
       console.log("image"+i)    
     }
@@ -97,7 +96,7 @@ export class PostComponent {
     
 
 
-    this.post?.mainComment?.subComments?.push(await this.commentService.postComment(commentDTO, this.post.mainComment.id));
+    this.post?.mainComment?.subComments?.push(await this.commentService.postComment(formData, this.post.mainComment.id));
 
     this.newComment = "";
   }

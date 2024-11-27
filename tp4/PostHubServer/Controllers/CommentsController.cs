@@ -16,27 +16,43 @@ namespace PostHubServer.Controllers
         private readonly UserManager<User> _userManager;
         private readonly PostService _postService;
         private readonly CommentService _commentService;
+        private readonly PictureService _pictService;
 
-        public CommentsController(UserManager<User> userManager, PostService postService, CommentService commentService)
+
+
+        public CommentsController(UserManager<User> userManager, PostService postService, CommentService commentService, PictureService pictureService)
         {
             _userManager = userManager;
             _postService = postService;
             _commentService = commentService;
+            _pictService = pictureService;
         }
 
         // Créer un nouveau commentaire. (Ne permet pas de créer le commentaire principal d'un post, pour cela,
         // voir l'action PostPost dans PostsController)
         [HttpPost("{parentCommentId}")]
         [Authorize]
-        public async Task<ActionResult<CommentDisplayDTO>> PostComment(int parentCommentId, CommentDTO commentDTO)
+        [DisableRequestSizeLimit]
+        public async Task<ActionResult> PostComment(int parentCommentId)
         {
+            var i = 0;
             User? user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             if (user == null) return Unauthorized();
+            List<Picture> pictures = new List<Picture>();
+            IFormCollection formCollection = await Request.ReadFormAsync();
+            IFormFile? file = formCollection.Files.GetFile("image"+ i);
+            string? text = Request.Form["text"];
+            while (file != null)
+            {
+                pictures.Add(await _pictService.CreateCommentPicture(file, formCollection));
+                i++;
+                file = formCollection.Files.GetFile("image" + i);
+            }
 
             Comment? parentComment = await _commentService.GetComment(parentCommentId);
             if (parentComment == null || parentComment.User == null) return BadRequest();
 
-            Comment? newComment = await _commentService.CreateComment(user, commentDTO.Text, parentComment);
+            Comment? newComment = await _commentService.CreateComment(user, text, parentComment);
             if (newComment == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             bool voteToggleSuccess = await _commentService.UpvoteComment(newComment.Id, user);
