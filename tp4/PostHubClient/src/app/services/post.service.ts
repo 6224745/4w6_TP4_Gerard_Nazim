@@ -34,9 +34,9 @@ export class PostService {
   }
 
   // Créer un post
-  async postPost(hubId : number, formData : FormData) : Promise<Post>{
+  async postPost(hubId : number, formData : any) : Promise<Post>{
    
-    let x = await lastValueFrom(this.http.post<Post>(domain + "api/Posts/PostPost/" + hubId, formData));
+    let x = await lastValueFrom(this.http.post<any>(domain + "api/Posts/PostPost/" + hubId, formData));
     console.log(x);
     return x;
   }

@@ -33,18 +33,32 @@ export class EditPostComponent {
 
   // Créer un nouveau post (et son commentaire principal)
   async createPost(){
-    let file = this.pictureInput?.nativeElement.files[0];
     if(this.postTitle == "" || this.postText == ""){
       alert("Remplis mieux le titre et le texte niochon");
       return;
     }
     if(this.hub == null) return;
-    const formData = new FormData()
+    if (this.pictureInput === undefined) {
+      console.log("Input HTML non chargé.");
+      return;
+    }
+    let index = 0
+    let file = this.pictureInput.nativeElement.files[index]
+    if (file == null) {
+      console.log("Input HTML ne contient aucune image.");
+      return;
+    }
+    let formData = new FormData()
     formData.append("title", this.postTitle)
     formData.append("text", this.postText)
-    formData.append("monImage", file, file.name);
+    while(file != null)
+    {
+      formData.append("MonImage"+ index, file, file.name)
+      file = this.pictureInput.nativeElement.files[index]
+      index++
+    }
 
-    const newPost : Post = await this.postService.postPost(this.hub.id, formData);
+    let newPost : Post = await this.postService.postPost(this.hub.id, formData);
 
     // On se déplace vers le nouveau post une fois qu'il est créé
     this.router.navigate(["/post", newPost.id]);
