@@ -1,5 +1,5 @@
 
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, viewChild } from '@angular/core';
 import { faDownLong, faEllipsis, faImage, faL, faMessage, faUpLong, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { CommentService } from '../services/comment.service';
 import { Comment } from '../models/comment';
@@ -17,6 +17,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 export class CommentComponent {
 
   @Input() comment : Comment | null = null;
+  @ViewChild('image', { static: false }) pictureInput?: ElementRef;
 
   // Icônes Font Awesome
   faEllipsis = faEllipsis;
@@ -62,7 +63,7 @@ export class CommentComponent {
     }
 
     this.comment.subComments.push(await this.commentService.postComment(commentDTO, this.comment.id));
-    
+
     this.replyToggle = false;
     this.repliesToggle = true;
     this.newComment = "";
@@ -109,7 +110,7 @@ export class CommentComponent {
   async upvote(){
     if(this.comment == null) return;
     await this.commentService.upvote(this.comment.id);
-    
+
     // Changements visuels immédiats
     if(this.comment.upvoted){
       this.comment.upvotes -= 1;

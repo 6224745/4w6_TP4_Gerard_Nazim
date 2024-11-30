@@ -44,6 +44,12 @@ namespace PostHubServer.Services
             return picture;
         }
 
+
+        public async Task<Picture> GetCommentPicture(int id)
+        {
+            Picture? pic = await _context.Pictures.FindAsync(id);
+            return pic;
+        }
         private bool IsContextNull() => _context == null || _context.Pictures == null;
     }
 }

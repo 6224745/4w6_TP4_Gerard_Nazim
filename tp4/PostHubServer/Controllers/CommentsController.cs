@@ -6,6 +6,7 @@ using PostHubServer.Models.DTOs;
 using PostHubServer.Models;
 using PostHubServer.Services;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace PostHubServer.Controllers
 {
@@ -161,7 +162,21 @@ namespace PostHubServer.Controllers
 
 
         }
-       
+        [HttpGet("{size}/{id}")]
+        public async Task<ActionResult> GetPicture(string size, int id)
+        {
+            Picture picture = await _pictService.GetCommentPicture(id);
+            if (picture == null) return NotFound(new { Message = "Cette image n'existe pas" });
+
+            if (!Regex.Match(size, "full|thumbnail").Success) return BadRequest(new { Message = "La taille demandée est inadéquate" });
+
+            byte[] bytes = System.IO.File.ReadAllBytes(Directory.GetCurrentDirectory() + "/images/" + size + "/" + picture.FileName);
+            return File(bytes, picture.MimeType);
+
+        }
+
+
+
     }
 }
 

@@ -8,7 +8,7 @@
       <div class="postDate">• {{comment.date | date:"dd MMMM yyyy hh:mm:ss":"":"fr"}}</div>
       <div class="spacer"></div>
     </div>
-  
+
     <!-- Texte du commentaire et éventuellement images -->
     <div class="postContent">
       <div style="flex:1; display:flex; align-items:center;">
@@ -19,10 +19,15 @@
       </div>
       <div class="commentPictures">
         <!-- Des images pourraient être affichées ici... -->
-         
+        <div *ngFor="let i of comment.pictureIds" class="picture">
+          <div class="pictureDelete">X</div>
+          <a [href]="'https://localhost:7216/api/Comments/GetPicture/full/' + i" target="_blank">
+            <img [src]="'https://localhost:7216/api/Comments/GetPicture/thumbnail/' + i" alt="Picture">
+          </a>
+
       </div>
     </div>
-  
+
     <!-- Nombreux boutons pour modifier le commentaire (votes, signalement, modification, etc.) -->
     <div class="postFooter">
       <div class="score" *ngIf="comment.username != null">
@@ -58,9 +63,9 @@
         <button *ngIf="editToggle" (click)="editComment()">Modifier</button>
       </div>
     </div>
-  
+
   </div>
-  
+
   <!-- Boîte pour répondre au commentaire affiché dans ce composant -->
   <div *ngIf="replyToggle" id="commentBox">
     <input type="text" name="newComment" id="newComment" placeholder="Ajouter un commentaire" [(ngModel)]="newComment">
@@ -71,7 +76,7 @@
     <button (click)="displayInputFile = !displayInputFile"><fa-icon [icon]="faImage"></fa-icon></button>
     <button (click)="createComment()">Ajouter</button>
   </div>
-  
+
   <!-- Liste de sous-commentaires -->
   <div id="subComments" *ngIf="repliesToggle">
     <div class="comment" *ngFor="let c of comment!.subComments">
