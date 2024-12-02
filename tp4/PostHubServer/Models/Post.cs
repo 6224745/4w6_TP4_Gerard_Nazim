@@ -11,6 +11,5 @@ namespace PostHubServer.Models
         [InverseProperty("MainCommentOf")]
         public virtual Comment? MainComment { get; set; } // Commentaire principal de l'auteur qui a créé le post
         public int MainCommentId { get; set; } // Id du commentaire principal de l'auteur qui a créé le post
-        public virtual Picture? image { get; set; }
     }
 }
