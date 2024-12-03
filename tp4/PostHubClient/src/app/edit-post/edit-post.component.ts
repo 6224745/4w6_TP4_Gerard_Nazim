@@ -41,13 +41,10 @@ export class EditPostComponent {
     if (this.pictureInput === undefined) {
       console.log("Input HTML non chargé.");
       return;
-    }
-  
+    } 
     // Get the selected file from the input element
     let i = 0
-    let file = this.pictureInput.nativeElement.files[0];
-
-  
+    let file = this.pictureInput.nativeElement.files; 
     // Check if no file was selected
     if (file == null) {
       console.log("Input HTML ne contient aucune image.");
@@ -59,12 +56,15 @@ export class EditPostComponent {
     formData.append("title",this.postTitle)
     formData.append("text",this.postText)
 
-    while( file != null){
-      formData.append("monImage"+i, file, file.name);
-       file = this.pictureInput.nativeElement.files[i];
-
+    let files = file[i]
+    while( files != null){
+      formData.append("monImage"+i, files, files.name);
       i++
+      files = file[i];
     }
+    console.log(formData.get("text"))
+    console.log(formData.get("title"))
+    console.log(formData.get("monImage"))
 
     let newPost : Post = await this.postService.postPost(this.hub.id, formData);
 

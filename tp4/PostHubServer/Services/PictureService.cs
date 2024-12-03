@@ -1,52 +1,53 @@
-﻿using PostHubServer.Data;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using PostHubServer.Data;
 using PostHubServer.Models;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using System.Text.RegularExpressions;
 
 namespace PostHubServer.Services
 {
     public class PictureService
     {
         private readonly PostHubContext _context;
-
         public PictureService(PostHubContext context)
         {
             _context = context;
         }
-
-        internal async Task<Picture> CreateCommentPicture(IFormFile file, IFormCollection formCollection)
+        public async Task<Picture?> CreateCommentPicture(IFormFile? file, IFormCollection formcollection)
         {
-            if (file == null || file.Length == 0)
-                throw new ArgumentException("Le fichier est invalide.");
-
-            // Définir le répertoire de stockage
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "comments");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            // Générer un nom unique pour le fichier
-            var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
-            var filePath = Path.Combine(uploadsFolder, fileName);
-            var mimeType = file.ContentType;
-
-            // Enregistrer le fichier sur le disque
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            if (IsContextNull()) return null;
+            Image? image = Image.Load(file.OpenReadStream());
+            Picture picture = new Picture
             {
-                await file.CopyToAsync(stream);
-            }
-
-            // Créer l'objet Picture et remplir ses propriétés
-            var picture = new Picture
-            {
-                FileName = fileName,
-                MimeType = mimeType
+                Id = 0,
+                FileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName),
+                MimeType = file.ContentType
             };
-
-            // Enregistrer la photo en base de données (si nécessaire)
+            image.Save(Directory.GetCurrentDirectory() + "/images/full/" + picture.FileName);
+            image.Mutate(i =>
+                i.Resize(new ResizeOptions()
+                {
+                    Mode = ResizeMode.Min,
+                    Size = new Size() { Width = 320 }
+                })
+            );
+            image.Save(Directory.GetCurrentDirectory() + "/images/thumbnail/" + picture.FileName);
             _context.Pictures.Add(picture);
             await _context.SaveChangesAsync();
-
             return picture;
         }
-
+        public async Task<Picture> GetCommentPicture(int id)
+        {
+            // À modifier
+            if (_context.Pictures == null)
+            {
+                return null;
+            }
+            Picture? pic = await _context.Pictures.FindAsync(id);
+            return pic;
+        }
         private bool IsContextNull() => _context == null || _context.Pictures == null;
     }
 }

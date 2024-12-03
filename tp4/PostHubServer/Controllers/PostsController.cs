@@ -35,47 +35,49 @@ namespace PostHubServer.Controllers
         // et le post lui-même.
         [HttpPost("{hubId}")]
         [Authorize]
-        public async Task<ActionResult<PostDisplayDTO>> PostPost(int hubId, PostDTO postDTO)
+        public async Task<ActionResult<PostDisplayDTO>> PostPost(int hubId)
         {
-            //Liste de pict
-            List<Picture> pictures = new List<Picture>();
-            var i = 0;
+            // Récupération du formulaire
             IFormCollection formCollection = await Request.ReadFormAsync();
+
+            // Extraction des fichiers
+            List<Picture> pictures = new List<Picture>();
+            int i = 0;
             IFormFile? file = formCollection.Files.GetFile("monImage" + i);
             while (file != null)
             {
                 pictures.Add(await _pictureService.CreateCommentPicture(file, formCollection));
                 i++;
                 file = formCollection.Files.GetFile("monImage" + i);
-
             }
-            // Extraire le texte et le titre du formulaire
+
+            // Extraction du texte et du titre
             string? title = formCollection["title"];
             string? text = formCollection["text"];
 
-            // Vérifier si les champs requis sont manquants
+            // Validation des données
             if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(text))
             {
                 return BadRequest("Le titre et le texte sont requis.");
             }
+
             // Obtenir l'utilisateur à partir du contexte actuel
             User? user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             if (user == null) return Unauthorized();
 
-            // Obtenir l'utilisateur à partir du contexte actuel
+            // Vérification du hub
             Hub? hub = await _hubService.GetHub(hubId);
             if (hub == null) return NotFound();
 
             // Créer le commentaire principal
-            Comment? mainComment = await _commentService.CreateComment(user, text, null, pictures); // pictures
+            Comment? mainComment = await _commentService.CreateComment(user, text, null, pictures);
             if (mainComment == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             // Créer le post
             Post? post = await _postService.CreatePost(title, hub, mainComment);
             if (post == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-
-            // Créer le post
+            // Ajout automatique d'un vote
             bool voteToggleSuccess = await _commentService.UpvoteComment(mainComment.Id, user);
             if (!voteToggleSuccess) return StatusCode(StatusCodes.Status500InternalServerError);
 
@@ -83,13 +85,13 @@ namespace PostHubServer.Controllers
             return Ok(new PostDisplayDTO(post, true, user));
         }
 
-            /// <summary>
-            /// Obtenir une list de posts selon certains critères
-            /// </summary>
-            /// <param name="tabName">"myHubs" ou "discover"</param>
-            /// <param name="sorting">"popular" ou "recent"</param>
-            /// <returns>Une liste de PostDisplayDTO pour afficher le commentaire principal de chaque Post</returns>
-            [HttpGet("{tabName}/{sorting}")]
+        /// <summary>
+        /// Obtenir une list de posts selon certains critères
+        /// </summary>
+        /// <param name="tabName">"myHubs" ou "discover"</param>
+        /// <param name="sorting">"popular" ou "recent"</param>
+        /// <returns>Une liste de PostDisplayDTO pour afficher le commentaire principal de chaque Post</returns>
+        [HttpGet("{tabName}/{sorting}")]
         public async Task<ActionResult<IEnumerable<PostDisplayDTO>>> GetPosts(string tabName, string sorting)
         {
             string? userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
