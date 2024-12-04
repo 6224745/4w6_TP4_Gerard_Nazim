@@ -18,12 +18,8 @@
         public bool Downvoted { get; set; }
         public int SubCommentTotal { get; set; }
         public List<CommentDisplayDTO>? SubComments { get; set; }
-<<<<<<< HEAD
 
         public List<int> PictureIds { get; set; }
-=======
-        public List<int> PicturesId { get; set; }
->>>>>>> origin/dev
         public CommentDisplayDTO() { }
         public CommentDisplayDTO(Comment comment, bool withSubComments, User? user)
         {
@@ -40,11 +36,7 @@
             Downvoted = user != null && (comment.Downvoters?.Contains(user) ?? false);
             SubCommentTotal = comment.GetSubCommentTotal();
             SubComments = subComments;
-<<<<<<< HEAD
             PictureIds = comment.Pictures.Select(p => p.Id).ToList();
-=======
-            PicturesId = comment.Pictures.Select(p => p.Id).ToList();
->>>>>>> origin/dev
         }
     }
 }
