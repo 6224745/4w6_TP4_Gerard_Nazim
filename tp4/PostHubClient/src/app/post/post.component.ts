@@ -1,12 +1,5 @@
-<<<<<<< HEAD
 import { Component, ElementRef, ViewChild } from '@angular/core';
-=======
-<<<<<<< HEAD
 import { lastValueFrom } from 'rxjs';
-=======
->>>>>>> origin/dev
-import { Component } from '@angular/core';
->>>>>>> origin/dev
 import { faDownLong, faEllipsis, faImage, faMessage, faUpLong, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Post } from '../models/post';
 import { PostService } from '../services/post.service';
