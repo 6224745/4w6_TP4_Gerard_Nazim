@@ -1,12 +1,8 @@
 ﻿using PostHubServer.Data;
 using PostHubServer.Models;
+using SixLabors.ImageSharp;
 
-using Microsoft.AspNetCore.Http;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using System.Drawing;
-using Image = SixLabors.ImageSharp.Image;
+using SixLabors.ImageSharp.Processing;
 
 namespace PostHubServer.Services
 {
@@ -18,12 +14,11 @@ namespace PostHubServer.Services
         {
             _context = context;
         }
-
         public async Task<Picture?> CreateCommentPicture(IFormFile? file, IFormCollection formcollection)
         {
             if (IsContextNull()) return null;
 
-           Image? image = Image.Load(file.OpenReadStream());
+            Image image = Image.Load(file.OpenReadStream());
             Picture picture = new Picture
             {
                 Id = 0,
@@ -36,15 +31,15 @@ namespace PostHubServer.Services
                 i.Resize(new ResizeOptions()
                 {
                     Mode = ResizeMode.Min,
-                    Size = new SixLabors.ImageSharp.Size() { Width = 320 }
+                    Size = new Size() { Width = 50 }
                 })
             );
             image.Save(Directory.GetCurrentDirectory() + "/images/thumbnail/" + picture.FileName);
 
+            _context.Pictures.Add(picture);
+            await _context.SaveChangesAsync();
             return picture;
         }
-
-
         public async Task<Picture> GetCommentPicture(int id)
         {
             Picture? pic = await _context.Pictures.FindAsync(id);

@@ -38,7 +38,7 @@ namespace PostHubServer.Controllers
             Hub? hub = await _hubService.GetHub(hubId);
             if (hub == null) return NotFound();
 
-            Comment? mainComment = await _commentService.CreateComment(user, postDTO.Text, null);
+            Comment? mainComment = await _commentService.CreateComment(user, postDTO.Text, null,null);
             if (mainComment == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             Post? post = await _postService.CreatePost(postDTO.Title, hub, mainComment);

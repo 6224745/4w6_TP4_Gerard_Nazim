@@ -1,4 +1,4 @@
-import { Component, viewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { faDownLong, faEllipsis, faImage, faMessage, faUpLong, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Post } from '../models/post';
 import { PostService } from '../services/post.service';
@@ -8,8 +8,6 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CommentComponent } from '../comment/comment.component';
-import { ElementRef } from '@angular/core';
-import { ViewChild } from '@angular/core';  
 
 @Component({
   selector: 'app-post',
@@ -20,18 +18,17 @@ import { ViewChild } from '@angular/core';
 })
 export class PostComponent {
   // Variables pour l'affichage ou associées à des inputs
+  @ViewChild("myPictureViewchild", {static:false}) pictureInput ?: ElementRef;
   post : Post | null = null;
   sorting : string = "popular";
   newComment : string = "";
   newMainCommentText : string = "";
-  @ViewChild('image', { static: false }) pictureInput?: ElementRef;
 
   // Booléens sus pour cacher / afficher des boutons
   isAuthor : boolean = false;
   editMenu : boolean = false;
   displayInputFile : boolean = false;
   toggleMainCommentEdit : boolean = false;
-  pictureIds : number[] = [];
 
   // Icônes Font Awesome
   faEllipsis = faEllipsis;
@@ -53,7 +50,6 @@ export class PostComponent {
 
     
     this.isAuthor = localStorage.getItem("username") == this.post?.mainComment?.username;
-   
   }
 
   async toggleSorting(){
@@ -62,45 +58,32 @@ export class PostComponent {
   }
 
   // Créer un commentaire directement associé au commentaire principal du post
- async createComment(){
+  async createComment(){
     if(this.newComment == ""){
       alert("Écris un commentaire niochon");
       return;
     }
 
-    
-    if(this.pictureInput == undefined) {
-
-      console.log("html pas charger")
-      return;
-
-
-    }
-    let i = 0;
     let formData = new FormData();
-    while(this.pictureInput.nativeElement.files[i] != null){
-    
-      let file = this.pictureInput.nativeElement.files[i];  
-    if(file == null){
-      console.log("IMAGE INAVALIIDE")
-      return;
+    formData.append("text", this.newComment);
+
+    if(this.post == null || this.post.mainComment == null) return;
+
+    if(this.pictureInput != null){
+      let count = 0;
+      let file = this.pictureInput.nativeElement.files[count];
+      while(file != null){
+        formData.append("image" + count, file);
+        count++;
+        file = this.pictureInput.nativeElement.files[count];
       }
-         
-      formData.append("image"+i, file,file.name);
-      formData.append("text", this.newComment);
-      i++;
-      console.log("image"+i)    
     }
-
-
     
 
-
-    this.post?.mainComment?.subComments?.push(await this.commentService.postComment(formData, this.post.mainComment.id));
+    this.post.mainComment.subComments?.push(await this.commentService.postComment(formData, this.post.mainComment.id));
 
     this.newComment = "";
   }
-
 
   // Upvote le commentaire principal du post
   async upvote(){

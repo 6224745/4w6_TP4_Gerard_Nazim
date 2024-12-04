@@ -213,3 +213,7 @@
     width:20px;
     cursor:pointer;
 }
+.picture{
+    display:inline-block;
+    position:relative;
+}

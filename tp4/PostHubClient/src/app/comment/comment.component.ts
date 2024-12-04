@@ -6,6 +6,9 @@ import { Comment } from '../models/comment';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { lastValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { PostComponent } from '../post/post.component';
 
 @Component({
   selector: 'app-comment',
@@ -17,8 +20,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 export class CommentComponent {
 
   @Input() comment : Comment | null = null;
-  @ViewChild('image', { static: false }) pictureInput?: ElementRef;
-
+  @ViewChild("myPictureViewchild", {static:false}) pictureInput ?: ElementRef;
   // Icônes Font Awesome
   faEllipsis = faEllipsis;
   faUpLong = faUpLong;
@@ -39,30 +41,42 @@ export class CommentComponent {
   newComment : string = "";
   editedText ?: string;
 
-  constructor(public commentService : CommentService) { }
+  constructor(public commentService : CommentService, public http : HttpClient) { }
 
   ngOnInit() {
     this.isAuthor = localStorage.getItem("username") == this.comment?.username;
     this.editedText = this.comment?.text;
+    console.log('Comment:', this.comment);
+    console.log('Picture IDs:', this.comment?.pictureIds);
   }
 
+  
   // Créer un nouveau sous-commentaire au commentaire affiché dans ce composant
   // (Pouvoir les commentaires du post, donc ceux qui sont enfant du commentaire principal du post,
   // voyez le composant fullPost !)
   async createComment(){
     if(this.newComment == ""){
-      alert("Écris un commentaire niochon !");
+      alert("Écris un commentaire");
       return;
     }
 
     if(this.comment == null) return;
     if(this.comment.subComments == null) this.comment.subComments = [];
 
-    let commentDTO = {
-      text : this.newComment
+    let formData = new FormData();
+    formData.append("text", this.newComment);
+
+    if(this.pictureInput != null){
+      let count = 0;
+      let file = this.pictureInput.nativeElement.files[count];
+      while(file != null){
+        formData.append("image" + count, file);
+        count++;
+        file = this.pictureInput.nativeElement.files[count];
+      }
     }
 
-    this.comment.subComments.push(await this.commentService.postComment(commentDTO, this.comment.id));
+    this.comment.subComments.push(await this.commentService.postComment(formData, this.comment.id))
 
     this.replyToggle = false;
     this.repliesToggle = true;
@@ -110,7 +124,7 @@ export class CommentComponent {
   async upvote(){
     if(this.comment == null) return;
     await this.commentService.upvote(this.comment.id);
-
+    
     // Changements visuels immédiats
     if(this.comment.upvoted){
       this.comment.upvotes -= 1;

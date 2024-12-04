@@ -1,6 +1,4 @@
 export class Comment{
-
-
     constructor(
         public id : number,
         public text : string,
@@ -13,6 +11,5 @@ export class Comment{
         public subCommentTotal : number,
         public subComments : Comment[] | null,
         public pictureIds : number[] | null
-
     ){}
 }

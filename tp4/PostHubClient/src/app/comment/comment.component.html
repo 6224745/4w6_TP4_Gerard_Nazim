@@ -8,9 +8,9 @@
       <div class="postDate">• {{comment.date | date:"dd MMMM yyyy hh:mm:ss":"":"fr"}}</div>
       <div class="spacer"></div>
     </div>
-
+  
     <!-- Texte du commentaire et éventuellement images -->
-    <div class="postContent">
+     <div class="postContent">
       <div style="flex:1; display:flex; align-items:center;">
         <img class="avatar" src="/assets/images/default.png" alt="Avatar">
         <div *ngIf="!editToggle">{{comment.text}}</div>
@@ -18,16 +18,15 @@
           [(ngModel)]="editedText">{{comment.text}}</textarea>
       </div>
       <div class="commentPictures">
-        <!-- Des images pourraient être affichées ici... -->
-        <div *ngFor="let i of comment.pictureIds" class="picture">
-          <div class="pictureDelete">X</div>
-          <a [href]="'https://localhost:7216/api/Comments/GetPicture/full/' + i" target="_blank">
-            <img [src]="'https://localhost:7216/api/Comments/GetPicture/thumbnail/' + i" alt="Picture">
-          </a>
-
+      <div *ngFor="let i of comment.pictureIds" class="picture">
+        <div class="pictureDelete">X</div>
+        <a [href]="'https://localhost:7216/api/Comments/GetPicture/full/' + i" target="_blank">
+          <img [src]="'https://localhost:7216/api/Comments/GetPicture/thumbnail/' + i" alt="Picture">
+        </a>
       </div>
+     </div>
     </div>
-
+  
     <!-- Nombreux boutons pour modifier le commentaire (votes, signalement, modification, etc.) -->
     <div class="postFooter">
       <div class="score" *ngIf="comment.username != null">
@@ -63,20 +62,20 @@
         <button *ngIf="editToggle" (click)="editComment()">Modifier</button>
       </div>
     </div>
-
+  
   </div>
-
+  
   <!-- Boîte pour répondre au commentaire affiché dans ce composant -->
   <div *ngIf="replyToggle" id="commentBox">
     <input type="text" name="newComment" id="newComment" placeholder="Ajouter un commentaire" [(ngModel)]="newComment">
     <div *ngIf="displayInputFile" class="commentPictureAdd">
       <!-- Il faudra modifier cet input -->
-      <input type="file" accept="images/*" name="commentPictures">
+      <input  #myPictureViewchild type="file" accept="images/*" name="commentPictures" multiple>
     </div>
     <button (click)="displayInputFile = !displayInputFile"><fa-icon [icon]="faImage"></fa-icon></button>
-    <button (click)="createComment()">Ajouter</button>
+    <button (click)="createComment()" >Ajouter</button>
   </div>
-
+  
   <!-- Liste de sous-commentaires -->
   <div id="subComments" *ngIf="repliesToggle">
     <div class="comment" *ngFor="let c of comment!.subComments">
