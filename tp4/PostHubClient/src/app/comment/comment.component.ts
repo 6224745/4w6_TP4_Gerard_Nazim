@@ -9,14 +9,13 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { lastValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { PostComponent } from '../post/post.component';
-
+const DOMAIN = "https://localhost:7216/";
 @Component({
   selector: 'app-comment',
   standalone: true,
   imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './comment.component.html',
   styleUrl: './comment.component.css'
-  
 })
 export class CommentComponent {
 
@@ -44,14 +43,14 @@ export class CommentComponent {
 
   constructor(public commentService : CommentService, public http : HttpClient) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.isAuthor = localStorage.getItem("username") == this.comment?.username;
     this.editedText = this.comment?.text;
     console.log('Comment:', this.comment);
     console.log('Picture IDs:', this.comment?.pictureIds);
   }
 
-  
+  // Gestionnaire d'erreur pour l'image de l'avatar
   // Créer un nouveau sous-commentaire au commentaire affiché dans ce composant
   // (Pouvoir les commentaires du post, donc ceux qui sont enfant du commentaire principal du post,
   // voyez le composant fullPost !)
@@ -157,11 +156,8 @@ export class CommentComponent {
       this.comment.upvoted = false;
       this.comment.upvotes -= 1;
     }
-    
   }
   
-  getAvatarUrl(username: string): string {
-    return `/api/users/${username}/avatar`;
-  }
+
 
 }

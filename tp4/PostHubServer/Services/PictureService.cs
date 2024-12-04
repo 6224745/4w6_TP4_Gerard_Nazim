@@ -1,8 +1,11 @@
-﻿using PostHubServer.Data;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PostHubServer.Data;
 using PostHubServer.Models;
 using SixLabors.ImageSharp;
-
 using SixLabors.ImageSharp.Processing;
+using System.Text.RegularExpressions;
 
 namespace PostHubServer.Services
 {
@@ -31,7 +34,7 @@ namespace PostHubServer.Services
                 i.Resize(new ResizeOptions()
                 {
                     Mode = ResizeMode.Min,
-                    Size = new Size() { Width = 50 }
+                    Size = new Size() { Width = 320 }
                 })
             );
             image.Save(Directory.GetCurrentDirectory() + "/images/thumbnail/" + picture.FileName);
@@ -40,11 +43,29 @@ namespace PostHubServer.Services
             await _context.SaveChangesAsync();
             return picture;
         }
+
         public async Task<Picture> GetCommentPicture(int id)
         {
             Picture? pic = await _context.Pictures.FindAsync(id);
             return pic;
         }
+        public async Task<bool> DeletePictureAsync(int id)
+        {
+            var picture = await _context.Pictures.FindAsync(id);
+            if (picture == null)
+            {
+                return false;
+            }
+
+            System.IO.File.Delete(Directory.GetCurrentDirectory() + "/images/full/" + picture.FileName);
+            System.IO.File.Delete(Directory.GetCurrentDirectory() + "/images/thumbnail/" + picture.FileName);
+
+            _context.Pictures.Remove(picture);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         private bool IsContextNull() => _context == null || _context.Pictures == null;
     }
 }

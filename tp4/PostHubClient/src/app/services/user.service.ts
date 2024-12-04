@@ -41,5 +41,16 @@ export class UserService {
     localStorage.setItem("token", x.token);
     localStorage.setItem("username", x.username);
   }
+  async changeAvatar(username: string, image: File): Promise<void> {
+    const formData = new FormData();
+    formData.append("image", image);
+
+    let response = await lastValueFrom(this.http.post<any>(`${domain}api/Users/ChangeAvatar/${username}`, formData));
+    console.log("Avatar changé :", response);
+  }
+
+  async getAvatar(username: string): Promise<Blob> {
+    return await lastValueFrom(this.http.get(`${domain}api/Users/GetAvatar/${username}`, { responseType: 'blob' }));
+  }
 
 }

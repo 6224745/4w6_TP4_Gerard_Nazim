@@ -1,47 +1,59 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { UserService } from '../services/user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css']
+  styleUrl: './profile.component.css'
 })
 export class ProfileComponent {
-userIsConnected: boolean = false;
-selectedFile: File | null = null;
+  userIsConnected : boolean = false;
+  @ViewChild("myPictureViewchild", {static:false}) pictureInput ?: ElementRef;
+  // Vous êtes obligés d'utiliser ces trois propriétés
+  oldPassword : string = "";
+  newPassword : string = "";
+  newPasswordConfirm : string = "";
+  username : string | null = null;
 
-// Vous êtes obligés d'utiliser ces trois propriétés
-oldPassword: string = "";
-newPassword: string = "";
-newPasswordConfirm: string = "";
+  avatarSrc: string | null = null;
+  constructor(public userService : UserService) { }
 
-username: string | null = null;
+  async ngOnInit() {
+    this.userIsConnected = localStorage.getItem("token") != null;
+    this.username = localStorage.getItem("username");
+    if (this.username) {
+      await this.loadAvatar();
+    }
+  }
+  
+  
+  async loadAvatar(): Promise<void> {
+    if (this.username) {
+      try {
+        const avatarBlob = await this.userService.getAvatar(this.username);
+        this.avatarSrc = URL.createObjectURL(avatarBlob);
+      } catch (error) {
+        console.log("Aucun avatar disponible pour cet utilisateur.");
+      }
+    }
+  }
 
-constructor(public userService: UserService, public http: HttpClient) { }
-
-ngOnInit() {
-  this.userIsConnected = localStorage.getItem("token") != null;
-  this.username = localStorage.getItem("username");
-}
-
-onFileSelected(event: any) {
-  this.selectedFile = event.target.files[0];
-}
-
-onUpload() {
-  if (this.selectedFile && this.username) {
-    const formData = new FormData();
-    formData.append('avatar', this.selectedFile, this.selectedFile.name);
-
-    this.http.post<any>(`https://localhost:7216/api/Users/UpdateAvatar/${this.username}/avatar`, formData)
-      .subscribe(response => {
-        console.log('Avatar uploaded successfully');
-      });
+  async onAvatarChange(event: any): Promise<void> {
+    const file = event.target.files[0];
+    if (file && this.username) {
+      try {
+        await this.userService.changeAvatar(this.username, file);
+        console.log("Avatar mis à jour !");
+        await this.loadAvatar(); // Recharger l'avatar mis à jour
+      } catch (error) {
+        console.error("Erreur lors de la modification de l'avatar :", error);
+      }
+    }
   }
 }
-}
+  
+  

@@ -29,6 +29,12 @@ export class CommentService {
     return x;
 
   }
+  async deletePicture(id : number){
+
+    let x = await lastValueFrom(this.http.delete<any>(domain + "api/Comments/DeletePicture/" + id));
+    console.log(x);
+
+  }
 
   // Supprimer un commentaire (que ce soit le commentaire principal d'un post ou un sous-commentaire)
   async deleteComment(commentId : number) : Promise<void>{

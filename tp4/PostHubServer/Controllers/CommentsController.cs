@@ -6,6 +6,8 @@ using PostHubServer.Models.DTOs;
 using PostHubServer.Models;
 using PostHubServer.Services;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +24,16 @@ namespace PostHubServer.Controllers
         private readonly CommentService _commentService;
         private readonly PictureService _pictureService;
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePicture(int id)
+        {
+            var result = await _pictureService.DeletePictureAsync(id);
+            if (!result)
+            {
+                return NotFound();
+            }
+            return Ok();
+        }
         public CommentsController(UserManager<User> userManager, PostService postService, CommentService commentService, PictureService pictureService)
         {
             _userManager = userManager;
@@ -29,6 +41,7 @@ namespace PostHubServer.Controllers
             _commentService = commentService;
             _pictureService = pictureService;
         }
+
 
         // Créer un nouveau commentaire. (Ne permet pas de créer le commentaire principal d'un post, pour cela,
         // voir l'action PostPost dans PostsController)
@@ -170,6 +183,7 @@ namespace PostHubServer.Controllers
 
             return Ok(new { Message = "Commentaire supprimé." });
         }
+
         [HttpGet("{size}/{id}")]
         public async Task<ActionResult> GetPicture(string size, int id)
         {
@@ -182,6 +196,5 @@ namespace PostHubServer.Controllers
             return File(bytes, picture.MimeType);
 
         }
-
     }
 }

@@ -23,6 +23,8 @@ export class PostComponent {
   sorting : string = "popular";
   newComment : string = "";
   newMainCommentText : string = "";
+  pictureIds : number[] = [];
+
 
   // Booléens sus pour cacher / afficher des boutons
   isAuthor : boolean = false;
@@ -137,5 +139,11 @@ export class PostComponent {
     if(this.post == null || this.post.mainComment == null) return;
     await this.commentService.deleteComment(this.post.mainComment.id);
     this.router.navigate(["/"]);
+  }
+  async deletePicture(id : number){
+
+    await this.commentService.deletePicture(id);
+    this.pictureIds.splice(this.pictureIds.indexOf(id), 1);
+
   }
 }

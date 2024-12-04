@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PostHubServer.Models;
 using PostHubServer.Models.DTOs;
 using PostHubServer.Services;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace PostHubServer.Controllers
 {
@@ -17,36 +19,68 @@ namespace PostHubServer.Controllers
         private readonly HubService _hubService;
         private readonly PostService _postService;
         private readonly CommentService _commentService;
+        private readonly PictureService _pictureService;
 
-        public PostsController(UserManager<User> userManager, HubService hubService, PostService postService, CommentService commentService)
+
+        public PostsController(UserManager<User> userManager, HubService hubService, PostService postService, CommentService commentService, PictureService pictureService)
         {
             _userManager = userManager;
             _hubService = hubService;
             _postService = postService;
             _commentService = commentService;
+            _pictureService = pictureService;
         }
 
         // Créer un nouveau Post. Cela crée en fait un nouveau commentaire (le commentaire principal du post)
         // et le post lui-même.
         [HttpPost("{hubId}")]
         [Authorize]
-        public async Task<ActionResult<PostDisplayDTO>> PostPost(int hubId, PostDTO postDTO)
+        [DisableRequestSizeLimit]
+        public async Task<ActionResult<PostDisplayDTO>> PostPost(int hubId)
         {
+            //Liste de pict
+            List<Picture> pictures = new List<Picture>();
+            var i = 0;
+            IFormCollection formCollection = await Request.ReadFormAsync();
+            IFormFile? file = formCollection.Files.GetFile("image" + i);
+            while (file != null)
+            {
+                pictures.Add(await _pictureService.CreateCommentPicture(file, formCollection));
+                i++;
+                file = formCollection.Files.GetFile("image" + i);
+
+            }
+            // Extraire le texte et le titre du formulaire
+            string? title = formCollection["title"];
+            string? text = formCollection["text"];
+
+            // Vérifier si les champs requis sont manquants
+            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(text))
+            {
+                return BadRequest("Le titre et le texte sont requis.");
+            }
+            // Obtenir l'utilisateur à partir du contexte actuel
             User? user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             if (user == null) return Unauthorized();
 
+            // Obtenir l'utilisateur à partir du contexte actuel
             Hub? hub = await _hubService.GetHub(hubId);
             if (hub == null) return NotFound();
 
-            Comment? mainComment = await _commentService.CreateComment(user, postDTO.Text, null,null);
+            // Créer le commentaire principal
+            Comment? mainComment = await _commentService.CreateComment(user, text, null, pictures); // pictures
             if (mainComment == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            Post? post = await _postService.CreatePost(postDTO.Title, hub, mainComment);
+            // Créer le post
+            Post? post = await _postService.CreatePost(title, hub, mainComment);
             if (post == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
+
+            // Créer le post
             bool voteToggleSuccess = await _commentService.UpvoteComment(mainComment.Id, user);
             if (!voteToggleSuccess) return StatusCode(StatusCodes.Status500InternalServerError);
 
+            // Retourner le PostDisplayDTO
             return Ok(new PostDisplayDTO(post, true, user));
         }
 

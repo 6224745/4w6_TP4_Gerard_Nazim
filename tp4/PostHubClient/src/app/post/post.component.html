@@ -1,38 +1,43 @@
 <div class="post" *ngIf="post != null">
 
-    <!-- Affichage du commentaire principal du post -->
-  
-    <!-- Auteur, date, hub -->
-    <div class="postHeader">
-      <div>{{post.mainComment!.username}}</div>
-      <div class="postDate">• {{post.mainComment!.date | date:"dd MMMM yyyy hh:mm:ss":"":"fr"}}</div>
-      <div style="cursor:pointer;" [routerLink]="['/postList/hub', post.hubId]">({{'dans ✦ ' + post.hubName}})</div>
-      <div class="spacer"></div>
-  
-      <!-- Petit menu caché pour modifier le post -->
-      <div class="editMenu" (click)="editMenu = !editMenu">
-        <button><fa-icon [icon]="faEllipsis"></fa-icon></button>
-        <div *ngIf="editMenu">
-          <div *ngIf="isAuthor" (click)="toggleMainCommentEdit = true">Modifier</div>
-          <div *ngIf="isAuthor" (click)="deleteComment()">Supprimer</div>
-          <div *ngIf="!isAuthor">Signaler</div>
+  <!-- Affichage du commentaire principal du post -->
+
+  <!-- Auteur, date, hub -->
+  <div class="postHeader">
+    <div>{{post.mainComment!.username}}</div>
+    <div class="postDate">• {{post.mainComment!.date | date:"dd MMMM yyyy hh:mm:ss":"":"fr"}}</div>
+    <div style="cursor:pointer;" [routerLink]="['/postList/hub', post.hubId]">({{'dans ✦ ' + post.hubName}})</div>
+    <div class="spacer"></div>
+
+    <!-- Petit menu caché pour modifier le post -->
+    <div class="editMenu" (click)="editMenu = !editMenu">
+      <button><fa-icon [icon]="faEllipsis"></fa-icon></button>
+      <div *ngIf="editMenu">
+        <div *ngIf="isAuthor" (click)="toggleMainCommentEdit = true">Modifier</div>
+        <div *ngIf="isAuthor" (click)="deleteComment()">Supprimer</div>
+        <div *ngIf="!isAuthor">Signaler</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Titre du post -->
+  <div class="postTitle">
+    {{post.title}}
+  </div>
+
+  <!-- Texte (et éventuellement images) du commentaire principal du post -->
+  <div class="postContent">
+    <div *ngIf="!toggleMainCommentEdit">{{post.mainComment!.text}}</div>
+    <textarea id="commentTextEdit" *ngIf="toggleMainCommentEdit" type="text"
+      [(ngModel)]="newMainCommentText"></textarea>
+    <div class="commentPictures">
+      <!-- Des images pourraient être affichées ici -->
+        <div *ngFor="let i of post.mainComment!.pictureIds" class="picture">
+          <div class="pictureDelete" (click)="deletePicture(i)" >X</div>
+          <a [href]="'https://localhost:7216/api/Comments/GetPicture/full/' + i" target="blank">
+            <img [src]="'https://localhost:7216/api/Comments/GetPicture/thumbnail/' + i" alt="Picture">
+          </a>
         </div>
-      </div>
-    </div>
-  
-    <!-- Titre du post -->
-    <div class="postTitle">
-      {{post.title}}
-    </div>
-  
-    <!-- Texte (et éventuellement images) du commentaire principal du post -->
-    <div class="postContent">
-      <div *ngIf="!toggleMainCommentEdit">{{post.mainComment!.text}}</div>
-      <textarea id="commentTextEdit" *ngIf="toggleMainCommentEdit" type="text" [(ngModel)]="newMainCommentText"></textarea>
-      <div>
-        <!-- Des images pourraient être affichées ici -->
-       
-      </div>
     </div>
   
     <!-- Boutons pour voter / modifier le commentaire principal du post -->

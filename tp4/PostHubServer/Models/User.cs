@@ -19,6 +19,5 @@ namespace PostHubServer.Models
         // Avatar
         public string? FileName { get; set; }
         public string? MimeType { get; set; }
-        public string UserName { get; set; }
     }
 }

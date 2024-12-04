@@ -12,7 +12,7 @@ using PostHubServer.Data;
 namespace PostHubServer.Migrations
 {
     [DbContext(typeof(PostHubContext))]
-    [Migration("20241126160127_init")]
+    [Migration("20241129191142_init")]
     partial class init
     {
         /// <inheritdoc />
