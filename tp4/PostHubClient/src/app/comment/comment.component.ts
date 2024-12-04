@@ -36,6 +36,7 @@ export class CommentComponent {
   isAuthor : boolean = false;
   editMenu : boolean = false;
   displayInputFile : boolean = false;
+  
 
   // Variables associées à des inputs
   newComment : string = "";

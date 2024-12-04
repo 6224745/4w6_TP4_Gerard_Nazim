@@ -20,6 +20,8 @@
         public List<CommentDisplayDTO>? SubComments { get; set; }
 
         public List<int> PictureIds { get; set; }
+        public bool signale { get; set; }
+
 
         public CommentDisplayDTO() { }
         public CommentDisplayDTO(Comment comment, bool withSubComments, User? user)

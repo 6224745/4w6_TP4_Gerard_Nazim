@@ -23,6 +23,7 @@ namespace PostHubServer.Controllers
         private readonly PostService _postService;
         private readonly CommentService _commentService;
         private readonly PictureService _pictureService;
+        protected readonly DbContext _context;
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePicture(int id)
@@ -34,12 +35,13 @@ namespace PostHubServer.Controllers
             }
             return Ok();
         }
-        public CommentsController(UserManager<User> userManager, PostService postService, CommentService commentService, PictureService pictureService)
+        public CommentsController(UserManager<User> userManager, PostService postService, CommentService commentService, PictureService pictureService,DbContext context)
         {
             _userManager = userManager;
             _postService = postService;
             _commentService = commentService;
             _pictureService = pictureService;
+            _context = context;
         }
 
 
@@ -195,6 +197,20 @@ namespace PostHubServer.Controllers
             byte[] bytes = System.IO.File.ReadAllBytes(Directory.GetCurrentDirectory() + "/images/" + size + "/" + picture.FileName);
             return File(bytes, picture.MimeType);
 
+        }
+        [HttpPost("report/{id}")]
+        public async Task<IActionResult> ReportComment(int id)
+        {
+            var comment = await _commentService.GetComment(id);
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            comment.signale = true;
+
+
+            return Ok();
         }
     }
 }
