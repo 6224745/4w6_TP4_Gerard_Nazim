@@ -92,8 +92,17 @@
         }
       }
     }
+<<<<<<< HEAD
   },
   "cli": {
     "analytics": false
+=======
+<<<<<<< HEAD
+  },
+  "cli": {
+    "analytics": false
+=======
+>>>>>>> origin/dev
+>>>>>>> origin/dev
   }
 }
