@@ -2,13 +2,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+<<<<<<< HEAD
 using Microsoft.EntityFrameworkCore;
+=======
+>>>>>>> origin/dev
 using PostHubServer.Models;
 using PostHubServer.Models.DTOs;
 using PostHubServer.Services;
 using System.Security.Claims;
+<<<<<<< HEAD
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+=======
+>>>>>>> origin/dev
 
 namespace PostHubServer.Controllers
 {
@@ -20,21 +26,30 @@ namespace PostHubServer.Controllers
         private readonly HubService _hubService;
         private readonly PostService _postService;
         private readonly CommentService _commentService;
+<<<<<<< HEAD
         private readonly PictureService _pictureService;
 
         public PostsController(UserManager<User> userManager, HubService hubService, PostService postService, CommentService commentService, PictureService pictureService)
+=======
+
+        public PostsController(UserManager<User> userManager, HubService hubService, PostService postService, CommentService commentService)
+>>>>>>> origin/dev
         {
             _userManager = userManager;
             _hubService = hubService;
             _postService = postService;
             _commentService = commentService;
+<<<<<<< HEAD
             _pictureService = pictureService;
+=======
+>>>>>>> origin/dev
         }
 
         // Créer un nouveau Post. Cela crée en fait un nouveau commentaire (le commentaire principal du post)
         // et le post lui-même.
         [HttpPost("{hubId}")]
         [Authorize]
+<<<<<<< HEAD
         public async Task<ActionResult<PostDisplayDTO>> PostPost(int hubId)
         {
             // Récupération du formulaire
@@ -82,6 +97,25 @@ namespace PostHubServer.Controllers
             if (!voteToggleSuccess) return StatusCode(StatusCodes.Status500InternalServerError);
 
             // Retourner le PostDisplayDTO
+=======
+        public async Task<ActionResult<PostDisplayDTO>> PostPost(int hubId, PostDTO postDTO)
+        {
+            User? user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            if (user == null) return Unauthorized();
+
+            Hub? hub = await _hubService.GetHub(hubId);
+            if (hub == null) return NotFound();
+
+            Comment? mainComment = await _commentService.CreateComment(user, postDTO.Text, null);
+            if (mainComment == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            Post? post = await _postService.CreatePost(postDTO.Title, hub, mainComment);
+            if (post == null) return StatusCode(StatusCodes.Status500InternalServerError);
+
+            bool voteToggleSuccess = await _commentService.UpvoteComment(mainComment.Id, user);
+            if (!voteToggleSuccess) return StatusCode(StatusCodes.Status500InternalServerError);
+
+>>>>>>> origin/dev
             return Ok(new PostDisplayDTO(post, true, user));
         }
 
