@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+import { lastValueFrom } from 'rxjs';
+=======
+>>>>>>> origin/dev
 import { Component } from '@angular/core';
 import { faDownLong, faEllipsis, faImage, faMessage, faUpLong, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Post } from '../models/post';

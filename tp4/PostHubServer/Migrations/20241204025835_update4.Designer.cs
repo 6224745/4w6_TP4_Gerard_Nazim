@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PostHubServer.Data;
 
@@ -11,9 +12,11 @@ using PostHubServer.Data;
 namespace PostHubServer.Migrations
 {
     [DbContext(typeof(PostHubContext))]
-    partial class PostHubContextModelSnapshot : ModelSnapshot
+    [Migration("20241204025835_update4")]
+    partial class update4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -258,12 +261,9 @@ namespace PostHubServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-<<<<<<< HEAD
                     b.Property<int?>("CommentId")
                         .HasColumnType("int");
 
-=======
->>>>>>> origin/dev
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -274,11 +274,8 @@ namespace PostHubServer.Migrations
 
                     b.HasKey("Id");
 
-<<<<<<< HEAD
                     b.HasIndex("CommentId");
 
-=======
->>>>>>> origin/dev
                     b.ToTable("Pictures");
                 });
 
@@ -492,7 +489,6 @@ namespace PostHubServer.Migrations
                     b.Navigation("User");
                 });
 
-<<<<<<< HEAD
             modelBuilder.Entity("PostHubServer.Models.Picture", b =>
                 {
                     b.HasOne("PostHubServer.Models.Comment", null)
@@ -500,8 +496,6 @@ namespace PostHubServer.Migrations
                         .HasForeignKey("CommentId");
                 });
 
-=======
->>>>>>> origin/dev
             modelBuilder.Entity("PostHubServer.Models.Post", b =>
                 {
                     b.HasOne("PostHubServer.Models.Hub", "Hub")
@@ -523,11 +517,8 @@ namespace PostHubServer.Migrations
                 {
                     b.Navigation("MainCommentOf");
 
-<<<<<<< HEAD
                     b.Navigation("Pictures");
 
-=======
->>>>>>> origin/dev
                     b.Navigation("SubComments");
                 });
 

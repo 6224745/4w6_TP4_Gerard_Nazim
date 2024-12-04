@@ -9,6 +9,11 @@ export class Comment{
         public upvoted : boolean,
         public downvoted : boolean,
         public subCommentTotal : number,
+<<<<<<< HEAD
+        public subComments : Comment[] | null,
+        public picturesId : number[]
+=======
         public subComments : Comment[] | null
+>>>>>>> origin/dev
     ){}
 }

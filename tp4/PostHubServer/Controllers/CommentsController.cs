@@ -6,6 +6,7 @@ using PostHubServer.Models.DTOs;
 using PostHubServer.Models;
 using PostHubServer.Services;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace PostHubServer.Controllers
 {
@@ -16,12 +17,14 @@ namespace PostHubServer.Controllers
         private readonly UserManager<User> _userManager;
         private readonly PostService _postService;
         private readonly CommentService _commentService;
+        private readonly PictureService _pictureService;
 
-        public CommentsController(UserManager<User> userManager, PostService postService, CommentService commentService)
+        public CommentsController(UserManager<User> userManager, PostService postService, CommentService commentService , PictureService pictureService)
         {
             _userManager = userManager;
             _postService = postService;
             _commentService = commentService;
+            _pictureService = pictureService;
         }
 
         // Créer un nouveau commentaire. (Ne permet pas de créer le commentaire principal d'un post, pour cela,
@@ -36,7 +39,7 @@ namespace PostHubServer.Controllers
             Comment? parentComment = await _commentService.GetComment(parentCommentId);
             if (parentComment == null || parentComment.User == null) return BadRequest();
 
-            Comment? newComment = await _commentService.CreateComment(user, commentDTO.Text, parentComment);
+            Comment? newComment = await _commentService.CreateComment(user, commentDTO.Text, parentComment, null);
             if (newComment == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             bool voteToggleSuccess = await _commentService.UpvoteComment(newComment.Id, user);
@@ -141,6 +144,23 @@ namespace PostHubServer.Controllers
             } while (comment != null && comment.User == null && comment.GetSubCommentTotal() == 0);
 
             return Ok(new { Message = "Commentaire supprimé." });
+        }
+
+        [HttpGet("{size}/{id}")]
+        public async Task<ActionResult> GetPicture(string size, int id)
+        {
+            Picture picture = await _pictureService.GetCommentPicture(id);
+            if (picture == null || picture.FileName == null || picture.MimeType == null)
+            {
+                return NotFound(new { Message = "Cette image n'existe pas" });
+            }
+            if (!(Regex.Match(size, "full|thumbnail").Success))
+            {
+                return BadRequest(new { Message = "La taille demandée est inadéquate" });
+            }
+            string path = Directory.GetCurrentDirectory() + "/images/" + size + "/" + picture.FileName;
+            byte[] bytes = System.IO.File.ReadAllBytes(path);
+            return File(bytes, picture.MimeType);
         }
     }
 }
