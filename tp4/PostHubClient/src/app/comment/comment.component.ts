@@ -156,6 +156,13 @@ export class CommentComponent {
       this.comment.upvoted = false;
       this.comment.upvotes -= 1;
     }
+    
+  }
+   async deleteImage(imageId: number) : Promise<void> {
+    const apiUrl = `https://localhost:7216/api/Comments/DeletePicture/${imageId}`;
+
+      let response =  await lastValueFrom(this.http.delete(apiUrl));
+      console.log(response);
   }
   
 

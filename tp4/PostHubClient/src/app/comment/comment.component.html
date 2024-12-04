@@ -19,7 +19,8 @@
       </div>
       <div class="commentPictures">
       <div *ngFor="let i of comment.pictureIds" class="picture">
-        <div class="pictureDelete">X</div>
+        <div class="pictureDelete"  (click)="deleteImage(i)">X</div>
+        
         <a [href]="'https://localhost:7216/api/Comments/GetPicture/full/' + i" target="_blank">
           <img [src]="'https://localhost:7216/api/Comments/GetPicture/thumbnail/' + i" alt="Picture">
         </a>
