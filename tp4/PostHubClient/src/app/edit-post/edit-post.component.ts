@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { Component, ElementRef, ViewChild } from '@angular/core';
-=======
 import { Component } from '@angular/core';
->>>>>>> origin/dev
 import { Post } from '../models/post';
 import { HubService } from '../services/hub.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,11 +18,7 @@ export class EditPostComponent {
   hub : Hub | null = null;
   postTitle : string = "";
   postText : string = "";
-<<<<<<< HEAD
-  @ViewChild("MyPicture", {static: false}) pictureInput ?: ElementRef;
-=======
 
->>>>>>> origin/dev
   constructor(public hubService : HubService, public route : ActivatedRoute, public postService : PostService, public router : Router) { }
 
   async ngOnInit() {
@@ -45,47 +37,14 @@ export class EditPostComponent {
     }
     if(this.hub == null) return;
 
-<<<<<<< HEAD
-
-    if (this.pictureInput === undefined) {
-      console.log("Input HTML non chargé.");
-      return;
-    } 
-    // Get the selected file from the input element
-    let index = 0
-    let file = this.pictureInput.nativeElement.files[0];
-    // Check if no file was selected
-    if (file == null) {
-      console.log("Input HTML ne contient aucune image.");
-      return;
-    }
-  
-    // Prepare the form data with the file to upload
-    let formData = new FormData();
-    formData.append("title",this.postTitle)
-    formData.append("text",this.postText)
-    
-    while(file != null)
-    {
-      formData.append("monImage"+index, file, file.name)
-      index++
-      file = this.pictureInput.nativeElement.files[index]
-    }
-    let newPost : Post = await this.postService.postPost(this.hub.id, formData);
-=======
     let postDTO = {
       title : this.postTitle,
       text : this.postText
     };
 
     let newPost : Post = await this.postService.postPost(this.hub.id, postDTO);
->>>>>>> origin/dev
 
     // On se déplace vers le nouveau post une fois qu'il est créé
     this.router.navigate(["/post", newPost.id]);
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/dev
