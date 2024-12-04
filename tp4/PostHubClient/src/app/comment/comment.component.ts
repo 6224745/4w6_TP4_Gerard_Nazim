@@ -16,6 +16,7 @@ import { PostComponent } from '../post/post.component';
   imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './comment.component.html',
   styleUrl: './comment.component.css'
+  
 })
 export class CommentComponent {
 
@@ -156,6 +157,11 @@ export class CommentComponent {
       this.comment.upvoted = false;
       this.comment.upvotes -= 1;
     }
+    
+  }
+  
+  getAvatarUrl(username: string): string {
+    return `/api/users/${username}/avatar`;
   }
 
 }

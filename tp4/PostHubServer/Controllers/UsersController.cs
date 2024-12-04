@@ -77,6 +77,46 @@ namespace PostHubServer.Controllers
                 return StatusCode(StatusCodes.Status400BadRequest,
                     new { Message = "Le nom d'utilisateur ou le mot de passe est invalide." });
             }
+
         }
+        [HttpPost("{username}/avatar")]
+        public async Task<IActionResult> UpdateAvatar(string username, [FromForm] IFormFile avatar)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null) return NotFound();
+
+            if (avatar != null && avatar.Length > 0)
+            {
+                user.FileName = avatar.FileName;
+                user.MimeType = avatar.ContentType;
+
+                // Enregistrez le fichier sur le serveur ou dans un stockage cloud ici...
+                var filePath = Path.Combine("path_to_avatars", avatar.FileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await avatar.CopyToAsync(stream);
+                }
+
+                await _userManager.UpdateAsync(user);
+            }
+
+            return Ok();
+        }
+        [HttpGet("{username}/avatar")]
+        public async Task<IActionResult> GetAvatar(string username)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null || string.IsNullOrEmpty(user.FileName)) return NotFound();
+
+            // Chemin où le fichier est stocké
+            var filePath = Path.Combine("path_to_avatars", user.FileName);
+
+            if (!System.IO.File.Exists(filePath)) return NotFound();
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+
+            return File(fileBytes, user.MimeType);
+        }
+
     }
 }
