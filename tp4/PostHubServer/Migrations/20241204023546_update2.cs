@@ -5,7 +5,7 @@
 namespace PostHubServer.Migrations
 {
     /// <inheritdoc />
-    public partial class jhdjchs : Migration
+    public partial class update2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

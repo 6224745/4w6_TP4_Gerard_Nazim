@@ -18,7 +18,7 @@ export class EditPostComponent {
   hub : Hub | null = null;
   postTitle : string = "";
   postText : string = "";
-  @ViewChild("pictureViewChild", {static: false}) pictureInput ?: ElementRef;
+  @ViewChild("MyPicture", {static: false}) pictureInput ?: ElementRef;
   constructor(public hubService : HubService, public route : ActivatedRoute, public postService : PostService, public router : Router) { }
 
   async ngOnInit() {
@@ -43,8 +43,8 @@ export class EditPostComponent {
       return;
     } 
     // Get the selected file from the input element
-    let i = 0
-    let file = this.pictureInput.nativeElement.files; 
+    let index = 0
+    let file = this.pictureInput.nativeElement.files[0];
     // Check if no file was selected
     if (file == null) {
       console.log("Input HTML ne contient aucune image.");
@@ -55,17 +55,13 @@ export class EditPostComponent {
     let formData = new FormData();
     formData.append("title",this.postTitle)
     formData.append("text",this.postText)
-
-    let files = file[i]
-    while( files != null){
-      formData.append("monImage"+i, files, files.name);
-      i++
-      files = file[i];
+    
+    while(file != null)
+    {
+      formData.append("monImage"+index, file, file.name)
+      index++
+      file = this.pictureInput.nativeElement.files[index]
     }
-    console.log(formData.get("text"))
-    console.log(formData.get("title"))
-    console.log(formData.get("monImage"))
-
     let newPost : Post = await this.postService.postPost(this.hub.id, formData);
 
     // On se déplace vers le nouveau post une fois qu'il est créé
