@@ -217,5 +217,20 @@ namespace PostHubServer.Controllers
             return Ok(new { Message = "Commentaire signalé" });
 
         }
+        [HttpGet]
+        [Authorize(Roles = "Moderator")]
+        public async Task<ActionResult<IEnumerable<CommentDisplayDTO>>> GetReportedComments()
+        {
+            var reportedComments = await _commentService.GetReportedComments();
+
+            if (reportedComments == null || !reportedComments.Any())
+            {
+                return NotFound(new { Message = "Aucun commentaire signalé trouvé." });
+            }
+
+            var reportedCommentsDTOs = reportedComments.Select(comment => new CommentDisplayDTO(comment, false, comment.User)).ToList();
+
+            return Ok(reportedCommentsDTOs);
+        }
     }
 }

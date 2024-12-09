@@ -1,4 +1,5 @@
-﻿using PostHubServer.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using PostHubServer.Data;
 using PostHubServer.Models;
 
 namespace PostHubServer.Services
@@ -148,5 +149,15 @@ namespace PostHubServer.Services
             return true;
         }
         private bool IsContextNull() => _context == null || _context.Comments == null;
+        public async Task<List<Comment>> GetReportedComments()
+        {
+            return await _context.Comments
+                .Where(c => c.IsReported)
+                .Include(c => c.User)
+                .ToListAsync();
+        }
+       
+
+
     }
 }
