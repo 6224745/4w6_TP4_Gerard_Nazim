@@ -37,25 +37,23 @@ namespace PostHubServer.Controllers
         [Authorize]
         public async Task<ActionResult<PostDisplayDTO>> PostPost(int hubId)
         {
-            // Récupération du formulaire
-            IFormCollection formCollection = await Request.ReadFormAsync();
-
-            // Extraction des fichiers
+            //Liste de pict
             List<Picture> pictures = new List<Picture>();
-            int i = 0;
-            IFormFile? file = formCollection.Files.GetFile("monImage" + i);
+            var index = 0;
+            IFormCollection formCollection = await Request.ReadFormAsync();
+            IFormFile? file = formCollection.Files.GetFile("monImage" + index);
             while (file != null)
             {
                 pictures.Add(await _pictureService.CreateCommentPicture(file, formCollection));
-                i++;
-                file = formCollection.Files.GetFile("monImage" + i);
+                index++;
+                file = formCollection.Files.GetFile("monImage" + index);
             }
 
-            // Extraction du texte et du titre
+            // Extraire le texte et le titre du formulaire
             string? title = formCollection["title"];
             string? text = formCollection["text"];
 
-            // Validation des données
+            // Vérifier si les champs requis sont manquants
             if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(text))
             {
                 return BadRequest("Le titre et le texte sont requis.");
@@ -65,19 +63,20 @@ namespace PostHubServer.Controllers
             User? user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             if (user == null) return Unauthorized();
 
-            // Vérification du hub
+            // Obtenir l'utilisateur à partir du contexte actuel
             Hub? hub = await _hubService.GetHub(hubId);
             if (hub == null) return NotFound();
 
             // Créer le commentaire principal
-            Comment? mainComment = await _commentService.CreateComment(user, text, null, pictures);
+            Comment? mainComment = await _commentService.CreateComment(user, text, null, pictures); // pictures
             if (mainComment == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
             // Créer le post
             Post? post = await _postService.CreatePost(title, hub, mainComment);
             if (post == null) return StatusCode(StatusCodes.Status500InternalServerError);
 
-            // Ajout automatique d'un vote
+
+            // Créer le post
             bool voteToggleSuccess = await _commentService.UpvoteComment(mainComment.Id, user);
             if (!voteToggleSuccess) return StatusCode(StatusCodes.Status500InternalServerError);
 
