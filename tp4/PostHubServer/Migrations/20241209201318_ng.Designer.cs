@@ -12,7 +12,7 @@ using PostHubServer.Data;
 namespace PostHubServer.Migrations
 {
     [DbContext(typeof(PostHubContext))]
-    [Migration("20241209200507_ng")]
+    [Migration("20241209201318_ng")]
     partial class ng
     {
         /// <inheritdoc />

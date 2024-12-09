@@ -22,7 +22,7 @@ namespace PostHubServer.Data
             User u1 = new User
 
             {
-                Id="11111111-1111-1111-1111-111111111111",
+                Id= "11111111-1111-1111-1111-111111111111",
                 UserName = "moderator",
                NormalizedUserName= "MODERATOR",
                Email="a@a.a",
