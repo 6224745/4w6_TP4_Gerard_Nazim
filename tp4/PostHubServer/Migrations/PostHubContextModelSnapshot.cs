@@ -214,6 +214,9 @@ namespace PostHubServer.Migrations
                     b.Property<DateTime?>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsReported")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("ParentCommentId")
                         .HasColumnType("int");
 
@@ -286,6 +289,9 @@ namespace PostHubServer.Migrations
 
                     b.Property<int?>("HubId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsReported")
+                        .HasColumnType("bit");
 
                     b.Property<int>("MainCommentId")
                         .HasColumnType("int");

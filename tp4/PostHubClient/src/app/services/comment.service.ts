@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 import { Comment } from '../models/comment';
 
 const domain = "https://localhost:7216/";
@@ -29,11 +29,10 @@ export class CommentService {
     return x;
 
   }
-  async deletePicture(id : number){
-
+  async deletePicture(id: number) {
     let x = await lastValueFrom(this.http.delete<any>(domain + "api/Comments/DeletePicture/" + id));
     console.log(x);
-
+    
   }
 
   // Supprimer un commentaire (que ce soit le commentaire principal d'un post ou un sous-commentaire)
@@ -56,4 +55,8 @@ export class CommentService {
     console.log(x);
   }
 
+  async reportComment(commentId : number){
+    let x = await lastValueFrom(this.http.put<any>(domain + "api/Comments/ReportComment/" + commentId, null));
+    console.log(x);
+  }
 }

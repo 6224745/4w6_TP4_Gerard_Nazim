@@ -36,7 +36,6 @@ export class CommentComponent {
   isAuthor : boolean = false;
   editMenu : boolean = false;
   displayInputFile : boolean = false;
-  
 
   // Variables associées à des inputs
   newComment : string = "";
@@ -157,15 +156,20 @@ export class CommentComponent {
       this.comment.upvoted = false;
       this.comment.upvotes -= 1;
     }
-    
   }
-   async deleteImage(imageId: number) : Promise<void> {
-    const apiUrl = `https://localhost:7216/api/Comments/DeletePicture/${imageId}`;
+  async deletePicture(pictureId : number){
 
-      let response =  await lastValueFrom(this.http.delete(apiUrl));
-      console.log(response);
-  }
-  
+    await this.commentService.deletePicture(pictureId);
+    this.comment?.pictureIds?.splice(this.comment.pictureIds.indexOf(pictureId),1);
+    }
 
 
+    async reportComment(id : number) : Promise<void> {
+      try {
+        await this.commentService.reportComment(id);
+        alert("Commentaire signalé");
+      } catch (error) {
+        alert("Erreur lors du signalement du commentaire");
+      }
+    }
 }

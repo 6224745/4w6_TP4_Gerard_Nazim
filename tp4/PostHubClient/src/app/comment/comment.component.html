@@ -19,8 +19,7 @@
       </div>
       <div class="commentPictures">
       <div *ngFor="let i of comment.pictureIds" class="picture">
-        <div class="pictureDelete"  (click)="deleteImage(i)">X</div>
-        
+        <div class="pictureDelete" (click)="deletePicture(i)">X</div>
         <a [href]="'https://localhost:7216/api/Comments/GetPicture/full/' + i" target="_blank">
           <img [src]="'https://localhost:7216/api/Comments/GetPicture/thumbnail/' + i" alt="Picture">
         </a>
@@ -46,7 +45,7 @@
         <div *ngIf="editMenu">
           <div *ngIf="isAuthor" (click)="this.editToggle = !this.editToggle">Modifier</div>
           <div *ngIf="isAuthor" (click)="deleteComment()">Supprimer</div>
-          <div *ngIf="!isAuthor">Signaler</div>
+          <div *ngIf="!isAuthor" (click) = "reportComment(comment.id)">Signaler</div>
         </div>
       </div>
       <div>

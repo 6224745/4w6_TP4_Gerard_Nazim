@@ -49,21 +49,36 @@ namespace PostHubServer.Services
             Picture? pic = await _context.Pictures.FindAsync(id);
             return pic;
         }
-        public async Task<bool> DeletePictureAsync(int id)
+        public async Task<bool> DeletePictureAsync(int id, string userId)
         {
-            var picture = await _context.Pictures.FindAsync(id);
-            if (picture == null)
+            Picture picture = await _context.Pictures.FindAsync(id);
+            User user = await _context.Users.FindAsync(userId);
+            if(picture == null)
+            {
+                return false;
+            }
+            if (user.Id != userId)
             {
                 return false;
             }
 
-            System.IO.File.Delete(Directory.GetCurrentDirectory() + "/images/full/" + picture.FileName);
-            System.IO.File.Delete(Directory.GetCurrentDirectory() + "/images/thumbnail/" + picture.FileName);
+            string fullImagePath = Path.Combine(Directory.GetCurrentDirectory(), "images", "full", picture.FileName);
+            string thumbnailImagePath = Path.Combine(Directory.GetCurrentDirectory(), "images", "thumbnail", picture.FileName);
 
+            if (File.Exists(fullImagePath))
+            {
+                File.Delete(fullImagePath);
+            }
+
+            if (File.Exists(thumbnailImagePath))
+            {
+                File.Delete(thumbnailImagePath);
+            }
             _context.Pictures.Remove(picture);
             await _context.SaveChangesAsync();
 
             return true;
+
         }
 
         private bool IsContextNull() => _context == null || _context.Pictures == null;

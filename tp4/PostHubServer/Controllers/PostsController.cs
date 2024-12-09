@@ -30,7 +30,22 @@ namespace PostHubServer.Controllers
             _commentService = commentService;
             _pictureService = pictureService;
         }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePicture(int id)
+        {
+            // Retrieve the current user's ID
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            // Attempt to delete the picture
+            var result = await _pictureService.DeletePictureAsync(id, userId);
+
+            if (!result)
+            {
+                return Unauthorized(new { Message = "Vous n'êtes pas autorisé à supprimer cette image" });
+            }
+
+            return Ok(new { Message = "Image supprimée" });
+        }
         // Créer un nouveau Post. Cela crée en fait un nouveau commentaire (le commentaire principal du post)
         // et le post lui-même.
         [HttpPost("{hubId}")]
@@ -197,6 +212,19 @@ namespace PostHubServer.Controllers
         private static IEnumerable<Post> GetRecentPosts(Hub hub, int qty)
         {
             return hub.Posts!.OrderByDescending(p => p.MainComment?.Date).Take(qty);
+        }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ReportPost(int id)
+        {
+            var result = await _postService.ReportPost(id);
+
+            if (!result)
+            {
+                return NotFound();
+            }
+
+            return Ok(new { Message = "Commentaire signalé" });
+
         }
     }
 }

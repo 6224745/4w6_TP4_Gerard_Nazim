@@ -20,8 +20,7 @@
         public List<CommentDisplayDTO>? SubComments { get; set; }
 
         public List<int> PictureIds { get; set; }
-        public bool signale { get; set; }
-
+        public bool IsReported { get; set; }
 
         public CommentDisplayDTO() { }
         public CommentDisplayDTO(Comment comment, bool withSubComments, User? user)
@@ -40,6 +39,7 @@
             SubCommentTotal = comment.GetSubCommentTotal();
             SubComments = subComments;
             PictureIds = comment.Pictures.Select(p => p.Id).ToList();
+            IsReported = comment.IsReported;
         }
     }
 }

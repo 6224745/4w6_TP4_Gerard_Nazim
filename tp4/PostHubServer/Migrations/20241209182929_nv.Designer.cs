@@ -12,8 +12,8 @@ using PostHubServer.Data;
 namespace PostHubServer.Migrations
 {
     [DbContext(typeof(PostHubContext))]
-    [Migration("20241129191142_init")]
-    partial class init
+    [Migration("20241209182929_nv")]
+    partial class nv
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -217,6 +217,9 @@ namespace PostHubServer.Migrations
                     b.Property<DateTime?>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsReported")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("ParentCommentId")
                         .HasColumnType("int");
 
@@ -289,6 +292,9 @@ namespace PostHubServer.Migrations
 
                     b.Property<int?>("HubId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsReported")
+                        .HasColumnType("bit");
 
                     b.Property<int>("MainCommentId")
                         .HasColumnType("int");

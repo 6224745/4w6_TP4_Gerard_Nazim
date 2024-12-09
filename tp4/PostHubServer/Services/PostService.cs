@@ -38,6 +38,18 @@ namespace PostHubServer.Services
             await _context.SaveChangesAsync();
             return post;
         }
+        public async Task<bool> ReportPost(int id)
+        {
+            var post = await GetPost(id);
+            if (post == null)
+            {
+                return false;
+            }
+
+            post.IsReported = true;
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
         private bool IsContextNull() => _context == null || _context.Posts == null;
     }

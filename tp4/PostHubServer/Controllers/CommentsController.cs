@@ -12,6 +12,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using Microsoft.AspNetCore.Http;
 using System.Text.RegularExpressions;
+using NuGet.Protocol.Plugins;
 
 namespace PostHubServer.Controllers
 {
@@ -23,25 +24,29 @@ namespace PostHubServer.Controllers
         private readonly PostService _postService;
         private readonly CommentService _commentService;
         private readonly PictureService _pictureService;
-        protected readonly DbContext _context;
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePicture(int id)
         {
-            var result = await _pictureService.DeletePictureAsync(id);
+            // Retrieve the current user's ID
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Attempt to delete the picture
+            var result = await _pictureService.DeletePictureAsync(id, userId);
+
             if (!result)
             {
-                return NotFound();
+                return Unauthorized(new { Message = "Vous n'êtes pas autorisé à supprimer cette image" });
             }
-            return Ok();
+
+            return Ok(new { Message = "Image supprimée" });
         }
-        public CommentsController(UserManager<User> userManager, PostService postService, CommentService commentService, PictureService pictureService,DbContext context)
+        public CommentsController(UserManager<User> userManager, PostService postService, CommentService commentService, PictureService pictureService)
         {
             _userManager = userManager;
             _postService = postService;
             _commentService = commentService;
             _pictureService = pictureService;
-            _context = context;
         }
 
 
@@ -198,19 +203,19 @@ namespace PostHubServer.Controllers
             return File(bytes, picture.MimeType);
 
         }
-        [HttpPost("report/{id}")]
+
+        [HttpPut("{id}")]
         public async Task<IActionResult> ReportComment(int id)
         {
-            var comment = await _commentService.GetComment(id);
-            if (comment == null)
+            var result = await _commentService.ReportComment(id);
+
+            if (!result)
             {
                 return NotFound();
             }
 
-            comment.signale = true;
+            return Ok(new { Message = "Commentaire signalé" });
 
-
-            return Ok();
         }
     }
 }

@@ -23,7 +23,6 @@ export class PostComponent {
   sorting : string = "popular";
   newComment : string = "";
   newMainCommentText : string = "";
-  pictureIds : number[] = [];
 
 
   // Booléens sus pour cacher / afficher des boutons
@@ -140,10 +139,17 @@ export class PostComponent {
     await this.commentService.deleteComment(this.post.mainComment.id);
     this.router.navigate(["/"]);
   }
-  async deletePicture(id : number){
-
-    await this.commentService.deletePicture(id);
-    this.pictureIds.splice(this.pictureIds.indexOf(id), 1);
-
+  async deletePicture(pictureId : number){
+   
+    await this.commentService.deletePicture(pictureId);
+    this.post?.mainComment?.pictureIds?.splice(this.post.mainComment.pictureIds.indexOf(pictureId),1);
+  }
+  async reportPost(id : number) : Promise<void> {
+    try {
+      await this.postService.reportPost(id);
+      alert("Commentaire signalé");
+    } catch (error) {
+      alert("Erreur lors du signalement du commentaire");
+    }
   }
 }

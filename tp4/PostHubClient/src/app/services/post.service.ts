@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 import { Post } from '../models/post';
+import { dom } from '@fortawesome/fontawesome-svg-core';
 
 const domain = "https://localhost:7216/";
 
@@ -47,5 +48,11 @@ export class PostService {
     console.log(x);
     return x;
   }
-
+  deletePicture(id: number): Observable<void> {
+    return this.http.delete<void>(`${domain}api/pictures/${id}`); // Make sure to replace with your correct endpoint
+  }
+  async reportPost(Id : number){
+    let x = await lastValueFrom(this.http.put<any>(domain + "api/Posts/ReportPost/" + Id, null));
+    console.log(x);
+  }
 }

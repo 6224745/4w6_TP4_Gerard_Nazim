@@ -135,7 +135,18 @@ namespace PostHubServer.Services
 
             return true; // Basculement du downvote réussi
         }
+        public async Task<bool> ReportComment(int id)
+        {
+            var comment = await GetComment(id);
+            if (comment == null)
+            {
+                return false;
+            }
 
+            comment.IsReported = true;
+            await _context.SaveChangesAsync();
+            return true;
+        }
         private bool IsContextNull() => _context == null || _context.Comments == null;
     }
 }

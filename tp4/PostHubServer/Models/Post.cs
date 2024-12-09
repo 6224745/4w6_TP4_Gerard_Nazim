@@ -12,5 +12,7 @@ namespace PostHubServer.Models
         public virtual Comment? MainComment { get; set; } // Commentaire principal de l'auteur qui a créé le post
         public int MainCommentId { get; set; } // Id du commentaire principal de l'auteur qui a créé le post
 
+        public bool IsReported { get; set; }
+
     }
 }
