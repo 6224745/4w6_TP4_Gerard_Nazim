@@ -1,3 +1,4 @@
+import { bootstrapApplication } from '@angular/platform-browser';
 import { lastValueFrom } from 'rxjs';
 import { Component } from '@angular/core';
 import { faDownLong, faEllipsis, faImage, faMessage, faUpLong, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -13,7 +14,7 @@ import { CommentComponent } from '../comment/comment.component';
 @Component({
   selector: 'app-post',
   standalone: true,
-  imports: [FormsModule, CommonModule, FontAwesomeModule, RouterModule, CommentComponent],
+  imports: [FormsModule, CommonModule, FontAwesomeModule, RouterModule, CommentComponent, ],
   templateUrl: './post.component.html',
   styleUrl: './post.component.css'
 })

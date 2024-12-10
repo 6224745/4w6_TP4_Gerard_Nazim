@@ -18,7 +18,8 @@ export class EditPostComponent {
   hub : Hub | null = null;
   postTitle : string = "";
   postText : string = "";
-  @ViewChild("MyPicture", {static: false}) pictureInput ?: ElementRef;
+  selectedFiles: File[] = [];
+  @ViewChild("MyPicture") pictureInput? : ElementRef;
   constructor(public hubService : HubService, public route : ActivatedRoute, public postService : PostService, public router : Router) { }
 
   async ngOnInit() {
@@ -27,6 +28,9 @@ export class EditPostComponent {
     if(hubId != null){
       this.hub = await this.hubService.getHub(+hubId);
     }
+  }
+  onFileSelected(event: any): void {
+    this.selectedFiles = Array.from(event.target.files);
   }
 
   // Créer un nouveau post (et son commentaire principal)
@@ -56,13 +60,11 @@ export class EditPostComponent {
     formData.append("title",this.postTitle)
     formData.append("text",this.postText)
     
-    while(file != null)
-    {
-      formData.append("monImage"+index, file, file.name)
-      index++
-      file = this.pictureInput.nativeElement.files[index]
-    }
+    this.selectedFiles.forEach((file, index) => {
+      formData.append("monImage" + index, file, file.name);
+    });
     let newPost : Post = await this.postService.postPost(this.hub.id, formData);
+    console.log(this.selectedFiles);
 
     // On se déplace vers le nouveau post une fois qu'il est créé
     this.router.navigate(["/post", newPost.id]);

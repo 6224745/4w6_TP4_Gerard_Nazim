@@ -31,7 +31,7 @@
     <textarea id="commentTextEdit" *ngIf="toggleMainCommentEdit" type="text" [(ngModel)]="newMainCommentText"></textarea>
     <div class="commentPictures">
       <!-- Des images pourraient être affichées ici -->
-      <img *ngFor="let p of post.mainComment!.PicturesId" alt="comment" [src]="'https://localhost:7216/api/Comments/GetPicture/thumbnail/' + p">
+      <img *ngFor="let p of post.mainComment!.PicturesId" alt="comment" src="'https://localhost:7216/api/Comments/GetPicture/thumbnail/' + p">
     </div>
   </div>
 
