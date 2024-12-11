@@ -12,6 +12,14 @@ export class PostService {
 
   constructor(public http : HttpClient) { }
 
+  
+  async deletePicture(pictureId : number) : Promise<void>
+  {
+    let x = await lastValueFrom(this.http.delete<any>(domain + "api/Comments/DeletePicture/" + pictureId))
+    console.log(x)
+
+  }
+
   // Obtenir une liste de posts en triant par nouveauté / popularité
   async getPostList(tab : string, sorting : string) : Promise<Post[]>{
     let x = await lastValueFrom(this.http.get<Post[]>(domain + "api/Posts/GetPosts/" + tab + "/" + sorting));

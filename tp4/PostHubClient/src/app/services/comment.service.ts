@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { Comment } from '../models/comment';
+import { dom } from '@fortawesome/fontawesome-svg-core';
 
 const domain = "https://localhost:7216/";
 
@@ -12,6 +13,13 @@ export class CommentService {
 
   constructor(public http : HttpClient) { }
 
+  async deletePicture(pictureId : number) : Promise<void>
+  {
+    let x = await lastValueFrom(this.http.delete<any>(domain + "api/Comments/DeletePicture/" + pictureId))
+    console.log(x)
+
+  }
+  
   // Modifier un commentaire (que ce soit le commentaire principal d'un post ou un sous-commentaire)
   async editComment(dto : any, commentId : number) : Promise<Comment>{
 
@@ -50,4 +58,11 @@ export class CommentService {
     console.log(x);
   }
 
+  async getPictureIds(commentId : number) : Promise<number[]>{
+
+    let x = await lastValueFrom(this.http.get<number[]>(domain + "api/Comments/GetCommentPictureIds/" + commentId));
+    console.log(x);
+    return x;
+
+  }
 }

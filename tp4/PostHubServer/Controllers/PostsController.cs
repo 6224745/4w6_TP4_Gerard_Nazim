@@ -6,9 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using PostHubServer.Models;
 using PostHubServer.Models.DTOs;
 using PostHubServer.Services;
-using System.Security.Claims;
+
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace PostHubServer.Controllers
 {
@@ -21,6 +22,7 @@ namespace PostHubServer.Controllers
         private readonly PostService _postService;
         private readonly CommentService _commentService;
         private readonly PictureService _pictureService;
+
 
         public PostsController(UserManager<User> userManager, HubService hubService, PostService postService, CommentService commentService, PictureService pictureService)
         {
@@ -39,14 +41,15 @@ namespace PostHubServer.Controllers
         {
             //Liste de pict
             List<Picture> pictures = new List<Picture>();
-            var index = 0;
+            var i = 0;
             IFormCollection formCollection = await Request.ReadFormAsync();
-            IFormFile? file = formCollection.Files.GetFile("monImage" + index);
+            IFormFile? file = formCollection.Files.GetFile("monImage" + i);
             while (file != null)
             {
-                pictures.Add(await _pictureService.CreateCommentPicture(file, formCollection));
-                index++;
-                file = formCollection.Files.GetFile("monImage" + index);
+                pictures.Add(await _pictureService.CreateCommentPicture(file));
+                i++;
+                file = formCollection.Files.GetFile("monImage" + i);
+
             }
 
             // Extraire le texte et le titre du formulaire

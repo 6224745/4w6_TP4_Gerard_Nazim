@@ -14,7 +14,7 @@
       <button><fa-icon [icon]="faEllipsis"></fa-icon></button>
       <div *ngIf="editMenu">
         <div *ngIf="isAuthor" (click)="toggleMainCommentEdit = true">Modifier</div>
-        <div *ngIf="isAuthor" (click)="deleteComment()">Supprimer</div>
+        <div *ngIf="isAuthor || isAdmin" (click)="deleteComment()">Supprimer</div>
         <div *ngIf="!isAuthor">Signaler</div>
       </div>
     </div>
@@ -28,25 +28,77 @@
   <!-- Texte (et éventuellement images) du commentaire principal du post -->
   <div class="postContent">
     <div *ngIf="!toggleMainCommentEdit">{{post.mainComment!.text}}</div>
-    <textarea id="commentTextEdit" *ngIf="toggleMainCommentEdit" type="text" [(ngModel)]="newMainCommentText"></textarea>
+    <textarea id="commentTextEdit" *ngIf="toggleMainCommentEdit" type="text"
+      [(ngModel)]="newMainCommentText"></textarea>
     <div class="commentPictures">
       <!-- Des images pourraient être affichées ici -->
-      <img *ngFor="let p of post.mainComment!.PicturesId" alt="comment" src="'https://localhost:7216/api/Comments/GetPicture/thumbnail/' + p">
+      <div *ngIf="post.mainComment!.PicturesId.length < 5">
+        <div *ngFor="let p of post.mainComment!.PicturesId" class="pictureFrame">
+          <a [href]="'https://localhost:7216/api/Comments/GetFullCommentPicture/' + p" target="_blank">
+            <img alt="comment" [src]="'https://localhost:7216/api/Comments/GetPicture/thumbnail/' + p">
+          </a>
+          <ng-container *ngIf="isAuthor == true">
+            <button class="close-btn pictureDelete" (click)="deletePicture(p); $event.stopPropagation()">
+              X
+            </button>
+          </ng-container>
+        </div>
+      </div>
+      <div style="width: 100%;" *ngIf="post.mainComment!.PicturesId!.length > 4">
+        <div class="glide">
+          <div class="glide__track" data-glide-el="track">
+            <ul class="glide__slides">
+              <li class="glide__slide" *ngFor="let p of post.mainComment!.PicturesId" #glideitems>
+                <div class="pictureFrame">
+                  <a [href]="'https://localhost:7216/api/Comments/GetFullCommentPicture/' + p" target="_blank">
+                    <img alt="comment" [src]="'https://localhost:7216/api/Comments/GetPicture/thumbnail/' + p">
+                  </a>
+                  <button *ngIf="isAuthor == true" class="close-btn pictureDelete" (click)="deletePicture(p)">
+                    X
+                  </button>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+
+          <!-- Les flèches pour le déplacement -->
+          <div class="glide__arrows" data-glide-el="controls">
+            <div class="arrow glide__arrow glide__arrow--left" data-glide-dir="<">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                style="align-self: center;">
+                <path d="M0 12l10.975 11 2.848-2.828-6.176-6.176H24v-3.992H7.646l6.176-6.176L10.975 1 0 12z"></path>
+              </svg>
+            </div>
+            <div class="arrow glide__arrow glide__arrow--right" data-glide-dir=">">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                style="align-self: center;">
+                <path d="M13.025 1l-2.847 2.828 6.176 6.176h-16.354v3.992h16.354l-6.176 6.176 2.847 2.828 10.975-11z">
+                </path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
   </div>
 
   <!-- Boutons pour voter / modifier le commentaire principal du post -->
   <div class="postFooter">
     <div class="score">
-      <button [class]="post.mainComment!.upvoted ? 'upvoted' : ''" (click)="upvote()"><fa-icon [icon]="faUpLong"></fa-icon></button>
+      <button [class]="post.mainComment!.upvoted ? 'upvoted' : ''" (click)="upvote()"><fa-icon
+          [icon]="faUpLong"></fa-icon></button>
       <div>{{post.mainComment!.upvotes - post.mainComment!.downvotes}}</div>
-      <button [class]="post.mainComment!.downvoted ? 'downvoted' : ''" (click)="downvote()"><fa-icon [icon]="faDownLong"></fa-icon></button>
+      <button [class]="post.mainComment!.downvoted ? 'downvoted' : ''" (click)="downvote()"><fa-icon
+          [icon]="faDownLong"></fa-icon></button>
     </div>
     <div>
       <button><fa-icon [icon]="faMessage"></fa-icon> {{post.mainComment!.subCommentTotal}}</button>
     </div>
     <div>
-      <input *ngIf="toggleMainCommentEdit" type="file" accept="images/*" name="mainCommentPictures">
+      <input *ngIf="toggleMainCommentEdit" type="file" accept="images/*" name="mainCommentPictures" multiple
+        #pictureViewChild>
     </div>
     <div>
       <button *ngIf="toggleMainCommentEdit" (click)="toggleMainCommentEdit = false">Annuler</button>
@@ -57,7 +109,7 @@
   </div>
 
   <!-- Trier les commentaires du post par nouveauté / votes -->
-  <div id="sortOptions">Trier par : 
+  <div id="sortOptions">Trier par :
     <select name="commentSort" id="commentSort" [(ngModel)]="sorting" (change)="toggleSorting()">
       <option value="popular">Populaire</option>
       <option value="new">Nouveau</option>
@@ -68,7 +120,7 @@
   <div id="commentBox">
     <input type="text" name="newComment" id="newComment" placeholder="Ajouter un commentaire" [(ngModel)]="newComment">
     <div *ngIf="displayInputFile" class="commentPictureAdd">
-      <input type="file" accept="images/*" name="commentPictures">
+      <input type="file" accept="images/*" name="commentPictures" #pictureViewChild multiple>
     </div>
     <button (click)="displayInputFile = !displayInputFile"><fa-icon [icon]="faImage"></fa-icon></button>
     <button (click)="createComment()">Ajouter</button>
@@ -76,7 +128,7 @@
 
   <!-- Liste de commentaires -->
   <div class="comment" *ngFor="let c of post.mainComment!.subComments">
-    <app-comment [comment]="c" ></app-comment>
+    <app-comment [comment]="c"></app-comment>
   </div>
 
 </div>
